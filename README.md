@@ -1,11 +1,11 @@
-![Inove banner](/inove.jpg)
+![Inove banner](inove.jpg)
 Inove Escuela de Código\
 info@inove.com.ar\
 Web: [Inove](http://inove.com.ar)
 
 ---
 
-# Django - Modelos y Administrador
+# Django - REST FRAMEWORK 2
 En este repositorio encontrarán los siguientes archivos:
 
 __Ejemplos que el profesor mostrará en clase__\
