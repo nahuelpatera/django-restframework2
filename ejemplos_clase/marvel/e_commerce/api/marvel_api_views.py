@@ -131,7 +131,7 @@ def get_comics(request):
     <table style="width:100%">
         <tr>
             <td>
-                <form action="http://localhost:8000/e-commerce/get_comics/" method="get" style ="visibility: {visibility};">
+                <form action="/e-commerce/get_comics/" method="get" style ="visibility: {visibility};">
                     <input type="number" id="button" name="offset" value="{previous}" style="visibility: hidden;">
                     <input type="submit" value="PREV" >
                 </form>
