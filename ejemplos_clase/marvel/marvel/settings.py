@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # Third party apps: acá vamos agregando las aplicaciones de terceros, extensiones de Django.
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
 ]
 
 REST_FRAMEWORK = {
@@ -171,3 +172,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AMARILLO = "\033[;33m"
 CIAN = "\033[;36m"
 VERDE = "\033[;32m"
+
+# NOTE: Para manejo de sesión.
+LOGIN_URL = '/admin/login'
+
+
+# API DOCS Settings:
+# https://drf-yasg.readthedocs.io/en/stable/settings.html
+LOGOUT_URL = '/admin/logout'
+
+# Acá van todas las configuraciones para la UI de Swagger.
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        }
+    },
+    "USE_SESSION_AUTH": True,
+    'LOGIN_URL': LOGIN_URL,
+    'LOGOUT_URL': LOGOUT_URL
+}
+
+# Acá van todas las configuraciones para la UI de Redoc.
+REDOC_SETTINGS = {
+   'LAZY_RENDERING': False,
+}
