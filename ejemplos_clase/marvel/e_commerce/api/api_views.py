@@ -32,6 +32,7 @@ from rest_framework.generics import DestroyAPIView
 # Importamos librerías para gestionar los permisos de acceso a nuestras APIs
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.authentication import BasicAuthentication, TokenAuthentication
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -48,14 +49,19 @@ from drf_yasg import openapi
 
 
 mensaje_headder = '''
-Ejemplo de header:
+Class API View
 
-`headers = {
+```
+headers = {
   'Authorization': 'Token 92937874f377a1ea17f7637ee07208622e5cb5e6',
+  
   'actions': 'PUT',
+  
   'Content-Type': 'application/json',
+  
   'Cookie': 'csrftoken=cfEuCX6qThpN6UC9eXypC71j6A4KJQagRSojPnqXfZjN5wJg09hXXQKCU8VflLDR'
-}`
+}
+```
 '''
 # NOTE: APIs genéricas:
 
@@ -67,8 +73,16 @@ class GetComicAPIView(ListAPIView):
     '''
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAdminUser | IsAuthenticated]
 
+    # Descomentar y mostrar en clases para ver las diferencias entre 
+    # estos tipos de Authentication. Mostrar en Postman.
+
+    # HTTP Basic Authentication
+    # authentication_classes = [BasicAuthentication]
+
+    # Token Authentication
+    # authentication_classes = [TokenAuthentication]
 
 
 class PostComicAPIView(CreateAPIView):
