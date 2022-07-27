@@ -74,7 +74,7 @@ class GetComicAPIView(ListAPIView):
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
 
-    # Equivale a permission_classes = (IsAdminUser & IsAuthenticated,)
+    # Equivale a --> permission_classes = (IsAdminUser & IsAuthenticated,)
     permission_classes = (IsAdminUser, IsAuthenticated)
     # Descomentar y mostrar en clases para ver las diferencias entre 
     # estos tipos de Authentication. Mostrar en Postman.
@@ -237,12 +237,17 @@ class LoginUserAPIView(APIView):
             account = authenticate(username=username, password=password)
 
             if account:
-                # Si el usuario existe y sus credenciales son validas, tratamos de obtener el TOKEN:
+                # Si el usuario existe y sus credenciales son validas,
+                # tratamos de obtener el TOKEN:
                 try:
                     token = Token.objects.get(user=account)
                 except Token.DoesNotExist:
                     # Si el TOKEN del usuario no existe, lo creamos automáticamente:
                     token = Token.objects.create(user=account)
+
+                # El try except se puede reemplazar por lo siguiente:
+                # token, created = Token.objects.get_or_create(user=user_account)
+                
                 # Con todos estos datos, construimos un JSON de respuesta:
                 user_data['user_id'] = account.pk
                 user_data['username'] = username
