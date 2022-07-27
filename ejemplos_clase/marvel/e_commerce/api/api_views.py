@@ -73,8 +73,9 @@ class GetComicAPIView(ListAPIView):
     '''
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
-    permission_classes = [IsAdminUser | IsAuthenticated]
 
+    # Equivale a permission_classes = (IsAdminUser & IsAuthenticated,)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     # Descomentar y mostrar en clases para ver las diferencias entre 
     # estos tipos de Authentication. Mostrar en Postman.
 
@@ -92,7 +93,7 @@ class PostComicAPIView(CreateAPIView):
     '''
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = (IsAuthenticated & IsAdminUser,)
 
 class ListCreateComicAPIView(ListCreateAPIView):
     __doc__ = f'''{mensaje_headder}
@@ -103,7 +104,7 @@ class ListCreateComicAPIView(ListCreateAPIView):
     '''
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = (IsAuthenticated & IsAdminUser,)
 
 class RetrieveUpdateComicAPIView(RetrieveUpdateAPIView):
     __doc__ = f'''{mensaje_headder}
@@ -112,7 +113,7 @@ class RetrieveUpdateComicAPIView(RetrieveUpdateAPIView):
     '''
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = (IsAuthenticated & IsAdminUser,)
 
 
 class DestroyComicAPIView(DestroyAPIView):
@@ -123,7 +124,7 @@ class DestroyComicAPIView(DestroyAPIView):
     '''
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = (IsAuthenticated & IsAdminUser,)
 
 # NOTE: APIs MIXTAS:
 
@@ -133,7 +134,7 @@ class GetOneComicAPIView(ListAPIView):
     Esta vista de API nos devuelve un comic en particular de la base de datos.
     '''
     serializer_class = ComicSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = (IsAuthenticated & IsAdminUser,)
 
     def get_queryset(self):
         '''
@@ -171,15 +172,15 @@ class LoginUserAPIView(APIView):
     }
     ```
     '''
-    parser_classes = [JSONParser]
+    parser_classes = (JSONParser,)
     # renderer_classes = [JSONRenderer]
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = ()
+    permission_classes = ()
 
     # NOTE: Agregamos todo esto para personalizar
     # el body de la request y los responses
     # que muestra como ejemplo el Swagger para
-    # este método.
+    # esta view.
 
     # NOTE 2: Descomentar dicho decorador para
     # mostrarlo en clase.
@@ -246,7 +247,7 @@ class LoginUserAPIView(APIView):
                 user_data['user_id'] = account.pk
                 user_data['username'] = username
                 user_data['first_name'] = account.first_name
-                user_data['last_name'] = account.first_name
+                user_data['last_name'] = account.last_name
                 user_data['email']=account.email
                 user_data['is_active'] = account.is_active
                 user_data['token'] = token.key                
