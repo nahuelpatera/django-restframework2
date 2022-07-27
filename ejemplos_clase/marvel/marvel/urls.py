@@ -43,12 +43,20 @@ schema_view = get_schema_view(
       license=openapi.License(name="Inove Coding School."),
    ),
    public=True,
-   permission_classes=[permissions.IsAuthenticatedOrReadOnly],
+   permission_classes=(permissions.IsAuthenticatedOrReadOnly,),
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('e-commerce/',include('e_commerce.api.urls')),
-    path('api-docs/swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api-docs/redoc', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path(
+        'api-docs/swagger',
+        schema_view.with_ui('swagger', cache_timeout=0),
+        name='schema-swagger-ui'
+    ),
+    path(
+        'api-docs/redoc',
+        schema_view.with_ui('redoc', cache_timeout=0),
+        name='schema-redoc'
+    ),
 ]
