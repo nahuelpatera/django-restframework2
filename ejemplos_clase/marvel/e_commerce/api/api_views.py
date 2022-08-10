@@ -6,9 +6,13 @@ from django.contrib.auth.models import User
 from e_commerce.models import Comic,WishList
 
 # Luego importamos las herramientas para crear las api views con Django REST FRAMEWORK:
+from django.shortcuts import get_object_or_404
 
 # (GET) Listar todos los elementos en la entidad:
 from rest_framework.generics import ListAPIView
+
+# (GET - Detalle) Lista un solo elemento de la entidad.
+from rest_framework.generics import RetrieveAPIView
 
 # (POST) Inserta elementos en la DB
 from rest_framework.generics import CreateAPIView
@@ -55,7 +59,7 @@ Class API View
 headers = {
   'Authorization': 'Token 92937874f377a1ea17f7637ee07208622e5cb5e6',
   
-  'actions': 'PUT',
+  'actions': 'GET', 'POST', 'PUT', 'PATCH', 'DELETE',
   
   'Content-Type': 'application/json',
   
@@ -95,6 +99,7 @@ class PostComicAPIView(CreateAPIView):
     serializer_class = ComicSerializer
     permission_classes = (IsAuthenticated & IsAdminUser,)
 
+
 class ListCreateComicAPIView(ListCreateAPIView):
     __doc__ = f'''{mensaje_headder}
     `[METODO GET-POST]`
@@ -105,6 +110,7 @@ class ListCreateComicAPIView(ListCreateAPIView):
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
     permission_classes = (IsAuthenticated & IsAdminUser,)
+
 
 class RetrieveUpdateComicAPIView(RetrieveUpdateAPIView):
     __doc__ = f'''{mensaje_headder}
@@ -126,6 +132,7 @@ class DestroyComicAPIView(DestroyAPIView):
     serializer_class = ComicSerializer
     permission_classes = (IsAuthenticated & IsAdminUser,)
 
+
 # NOTE: APIs MIXTAS:
 
 class GetOneComicAPIView(ListAPIView):
@@ -144,11 +151,41 @@ class GetOneComicAPIView(ListAPIView):
         el comic del ID solicitado.  
         '''
         try:
-            comic_id = self.kwargs['comic_id']
+            comic_id = self.kwargs['pk']
             queryset = Comic.objects.filter(id=comic_id)
             return queryset
         except Exception as error:
             return {'error': f'Ha ocurrido la siguiente excepción: {error}'}
+
+# Otra forma de realizar un Get y traernos un solo
+# objeto o instancia(Detalle).
+# class GetOneComicAPIView(RetrieveAPIView):
+#     serializer_class = ComicSerializer
+#     permission_classes = (IsAuthenticated & IsAdminUser,)
+#     queryset = serializer_class.Meta.model.objects.filter()
+    
+#     # def get_queryset(self):
+#     #     # A partir del serializador, accedo al modelo y realizo
+#     #     # el filtrado.
+#     #     return self.get_serializer().Meta.model.objects.filter()
+
+# class GetOneComicAPIView(ListAPIView):
+#     serializer_class = ComicSerializer
+#     permission_classes = (IsAuthenticated & IsAdminUser,)
+
+#     def get_queryset(self, pk=None):
+#         # NOTE: Probar que sucede si ingreso un pk(id) que no existe.
+#         return self.serializer_class.Meta.model.objects.get(pk=pk)
+#         # return get_object_or_404(self.serializer_class.Meta.model, pk=pk)
+    
+#     def get(self, request, pk=None):
+#         serializer = self.get_serializer(
+#             instance=self.get_queryset(pk=pk), many=False
+#         )
+#         return Response(
+#             data=serializer.data, status=status.HTTP_200_OK
+#         )
+
 
 class LoginUserAPIView(APIView):
     '''
@@ -209,7 +246,7 @@ class LoginUserAPIView(APIView):
     #                     "username": "username",
     #                     "first_name": "first_name",
     #                     "last_name": "last_name",
-    #                     "email": "email@email.com",
+    #                     "email": "info@inove.com.ar",
     #                     "is_active": True,
     #                     "token": "92937874f377a1ea17f7637ee07208622e5cb5e6"
     #                 }
@@ -246,7 +283,7 @@ class LoginUserAPIView(APIView):
                     token = Token.objects.create(user=account)
 
                 # El try except se puede reemplazar por lo siguiente:
-                # token, created = Token.objects.get_or_create(user=user_account)
+                # token, created = Token.objects.get_or_create(user=account)
                 
                 # Con todos estos datos, construimos un JSON de respuesta:
                 user_data['user_id'] = account.pk
