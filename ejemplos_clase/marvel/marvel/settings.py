@@ -183,19 +183,23 @@ LOGOUT_URL = '/admin/logout'
 
 # Acá van todas las configuraciones para la UI de Swagger.
 SWAGGER_SETTINGS = {
+    'DEFAULT_MODEL_RENDERING': "example",
     # Seteo los tipos de Authenticaciones que puedo utilizar en
     # Swagger.
     # https://drf-yasg.readthedocs.io/en/stable/settings.html#security-definitions-settings
     'SECURITY_DEFINITIONS': {
         # HTTP Basic Authentication:
         'basic': {
-            'type': 'basic'
+            'description': "Basic Auth",
+            'type': 'basic',
+            'in': 'header'
         },
         # Token Authentication:
         'DRF Token': {
-               'type': 'apiKey',
-               'name': 'Authorization',
-               'in': 'header'
+            'description': '**Ejemplo: Token ea0dfcbbdff1a55ae26a67cd71bcc6adffb1f200**',
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
          }
     },
     "USE_SESSION_AUTH": True,
