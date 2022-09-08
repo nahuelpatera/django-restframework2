@@ -84,7 +84,7 @@ class GetComicAPIView(ListAPIView):
     # estos tipos de Authentication. Mostrar en Postman.
 
     # HTTP Basic Authentication
-    authentication_classes = [BasicAuthentication]
+    # authentication_classes = [BasicAuthentication]
 
     # Token Authentication
     # authentication_classes = [TokenAuthentication]
@@ -187,32 +187,32 @@ class GetOneComicAPIView(ListAPIView):
 #         )
 
 
-# class LoginUserAPIView(APIView):
-#     '''
-#     ```
-#     Vista de API personalizada para recibir peticiones de tipo POST.
-#     Esquema de entrada:
-#     {"username":"root", "password":12345}
+class LoginUserAPIView(APIView):
+    '''
+    ```
+    Vista de API personalizada para recibir peticiones de tipo POST.
+    Esquema de entrada:
+    {"username":"root", "password":12345}
     
-#     Utilizaremos JSONParser para tener  'Content-Type': 'application/json'\n\n
-#     Esta función sobrescribe la función post original de esta clase,
-#     recibe "request" y hay que setear format=None, para poder recibir 
-#     los datos en "request.data", la idea es obtener los datos enviados en el 
-#     request y autenticar al usuario con la función "authenticate()", 
-#     la cual devuelve el estado de autenticación.
-#     Luego con estos datos se consulta el Token generado para el usuario,
-#     si no lo tiene asignado, se crea automáticamente.
-#     Esquema de entrada:\n
-#     {
-#         "username": "root",
-#         "password": 12345
-#     }
-#     ```
-#     '''
-#     parser_classes = (JSONParser,)
-#     # renderer_classes = [JSONRenderer]
-#     authentication_classes = ()
-#     permission_classes = ()
+    Utilizaremos JSONParser para tener  'Content-Type': 'application/json'\n\n
+    Esta función sobrescribe la función post original de esta clase,
+    recibe "request" y hay que setear format=None, para poder recibir 
+    los datos en "request.data", la idea es obtener los datos enviados en el 
+    request y autenticar al usuario con la función "authenticate()", 
+    la cual devuelve el estado de autenticación.
+    Luego con estos datos se consulta el Token generado para el usuario,
+    si no lo tiene asignado, se crea automáticamente.
+    Esquema de entrada:\n
+    {
+        "username": "root",
+        "password": 12345
+    }
+    ```
+    '''
+    parser_classes = (JSONParser,)
+    # renderer_classes = [JSONRenderer]
+    authentication_classes = ()
+    permission_classes = ()
 
 #     # NOTE: Agregamos todo esto para personalizar
 #     # el body de la request y los responses
@@ -263,103 +263,103 @@ class GetOneComicAPIView(ListAPIView):
     # #         ),
     # #     }
     # # )
-#     def post(self, request):
-#         user_data = {}
-#         try:
-#             # Obtenemos los datos del request:
-#             username = request.data.get('username')
-#             password = request.data.get('password')
-#             # Obtenemos el objeto del modelo user, a partir del usuario y contraseña,
-#             # NOTE: es importante el uso de este método, porque aplica el hash del password!
-#             account = authenticate(username=username, password=password)
-
-#             if account:
-#                 # Si el usuario existe y sus credenciales son validas,
-#                 # tratamos de obtener el TOKEN:
-#                 try:
-#                     token = Token.objects.get(user=account)
-#                 except Token.DoesNotExist:
-#                     # Si el TOKEN del usuario no existe, lo creamos automáticamente:
-#                     token = Token.objects.create(user=account)
-
-#                 # El try except se puede reemplazar por lo siguiente:
-#                 # token, created = Token.objects.get_or_create(user=account)
-                
-#                 # Con todos estos datos, construimos un JSON de respuesta:
-#                 user_data['user_id'] = account.pk
-#                 user_data['username'] = username
-#                 user_data['first_name'] = account.first_name
-#                 user_data['last_name'] = account.last_name
-#                 user_data['email']=account.email
-#                 user_data['is_active'] = account.is_active
-#                 user_data['token'] = token.key                
-#                 # Devolvemos la respuesta personalizada
-#                 return Response(
-#                     data=user_data, status=status.HTTP_201_CREATED
-#                 )
-#             else:
-#                 # Si las credenciales son invalidas, devolvemos algun mensaje de error:
-#                 user_data['response'] = 'Error'
-#                 user_data['error_message'] = 'Credenciales invalidas'
-#                 return Response(
-#                     data=user_data, status=status.HTTP_401_UNAUTHORIZED
-#                 )
-
-#         except Exception as error:
-#             # Si aparece alguna excepción, devolvemos un mensaje de error
-#             user_data['response'] = 'Error'
-#             user_data['error_message'] = error
-#             return Response(
-#                 data=user_data, status=status.HTTP_400_BAD_REQUEST
-#             )
-
-class LoginUserAPIView(APIView):
-    '''
-    ```
-    Vista de API personalizada para recibir peticiones de tipo POST.
-    Esquema de entrada:
-    {"username":"root", "password":12345}
-    
-    Utilizaremos JSONParser para tener  'Content-Type': 'application/json'\n\n
-    Esta función sobrescribe la función post original de esta clase,
-    recibe "request" y hay que setear format=None, para poder recibir 
-    los datos en "request.data", la idea es obtener los datos enviados en el 
-    request y autenticar al usuario con la función "authenticate()", 
-    la cual devuelve el estado de autenticación.
-    Luego con estos datos se consulta el Token generado para el usuario,
-    si no lo tiene asignado, se crea automáticamente.
-    Esquema de entrada:\n
-    {
-        "username": "root",
-        "password": 12345
-    }
-    ```
-    '''
-    parser_classes = (JSONParser,)
-    # renderer_classes = [JSONRenderer]
-    authentication_classes = ()
-    permission_classes = ()
-
     def post(self, request):
-        usertokenserializer = UserTokenSerializer(data=request.data)
-        if usertokenserializer.is_valid():
-            _username = request.data.get('username')
-            _password = request.data.get('password')
+        user_data = {}
+        try:
+            # Obtenemos los datos del request:
+            username = request.data.get('username')
+            password = request.data.get('password')
+            # Obtenemos el objeto del modelo user, a partir del usuario y contraseña,
+            # NOTE: es importante el uso de este método, porque aplica el hash del password!
+            account = authenticate(username=username, password=password)
 
-            # No hace falta validar si existe el account porque en el
-            # serializador ya lo hicimos, por ende, si estamos parados acá es
-            #  porque el username y password son correctas.
-            _account = authenticate(username=_username, password=_password)
-            _token, _created = Token.objects.get_or_create(user=_account)
+            if account:
+                # Si el usuario existe y sus credenciales son validas,
+                # tratamos de obtener el TOKEN:
+                try:
+                    token = Token.objects.get(user=account)
+                except Token.DoesNotExist:
+                    # Si el TOKEN del usuario no existe, lo creamos automáticamente:
+                    token = Token.objects.create(user=account)
+
+                # El try except se puede reemplazar por lo siguiente:
+                # token, created = Token.objects.get_or_create(user=account)
+                
+                # Con todos estos datos, construimos un JSON de respuesta:
+                user_data['user_id'] = account.pk
+                user_data['username'] = username
+                user_data['first_name'] = account.first_name
+                user_data['last_name'] = account.last_name
+                user_data['email']=account.email
+                user_data['is_active'] = account.is_active
+                user_data['token'] = token.key                
+                # Devolvemos la respuesta personalizada
+                return Response(
+                    data=user_data, status=status.HTTP_201_CREATED
+                )
+            else:
+                # Si las credenciales son invalidas, devolvemos algun mensaje de error:
+                user_data['response'] = 'Error'
+                user_data['error_message'] = 'Credenciales invalidas'
+                return Response(
+                    data=user_data, status=status.HTTP_401_UNAUTHORIZED
+                )
+
+        except Exception as error:
+            # Si aparece alguna excepción, devolvemos un mensaje de error
+            user_data['response'] = 'Error'
+            user_data['error_message'] = error
             return Response(
-                data=TokenSerializer(instance=_token, many=False).data,
-                status=status.HTTP_200_OK
+                data=user_data, status=status.HTTP_400_BAD_REQUEST
             )
 
-        return Response(
-            data=usertokenserializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+# class LoginUserAPIView(APIView):
+#     '''
+#     ```
+#     Vista de API personalizada para recibir peticiones de tipo POST.
+#     Esquema de entrada:
+#     {"username":"root", "password":12345}
+    
+#     Utilizaremos JSONParser para tener  'Content-Type': 'application/json'\n\n
+#     Esta función sobrescribe la función post original de esta clase,
+#     recibe "request" y hay que setear format=None, para poder recibir 
+#     los datos en "request.data", la idea es obtener los datos enviados en el 
+#     request y autenticar al usuario con la función "authenticate()", 
+#     la cual devuelve el estado de autenticación.
+#     Luego con estos datos se consulta el Token generado para el usuario,
+#     si no lo tiene asignado, se crea automáticamente.
+#     Esquema de entrada:\n
+#     {
+#         "username": "root",
+#         "password": 12345
+#     }
+#     ```
+#     '''
+#     parser_classes = (JSONParser,)
+#     # renderer_classes = [JSONRenderer]
+#     authentication_classes = ()
+#     permission_classes = ()
+
+#     def post(self, request):
+#         usertokenserializer = UserTokenSerializer(data=request.data)
+#         if usertokenserializer.is_valid():
+#             _username = request.data.get('username')
+#             _password = request.data.get('password')
+
+#             # No hace falta validar si existe el account porque en el
+#             # serializador ya lo hicimos, por ende, si estamos parados acá es
+#             #  porque el username y password son correctas.
+#             _account = authenticate(username=_username, password=_password)
+#             _token, _created = Token.objects.get_or_create(user=_account)
+#             return Response(
+#                 data=TokenSerializer(instance=_token, many=False).data,
+#                 status=status.HTTP_200_OK
+#             )
+
+#         return Response(
+#             data=usertokenserializer.errors,
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
 
 
 # TODO: Agregar las vistas genericas(vistas de API basadas en clases) 
