@@ -1,12 +1,17 @@
-# Import models:
-from e_commerce.models import *
-
-from marvel.settings import VERDE, CIAN, AMARILLO
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 import requests
 import json
 import hashlib
+
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import TemplateHTMLRenderer
+from drf_yasg.utils import swagger_auto_schema
+
+from e_commerce.models import *
+from marvel.settings import VERDE, CIAN, AMARILLO
+
 
 # NOTE: Declaramos las variables que tienen que ver con la API KEY de Marvel:
 
@@ -19,14 +24,21 @@ URL_BASE = 'http://gateway.marvel.com/v1/public/'
 ENDPOINT = 'comics'
 PARAMS = dict(ts=TS, apikey=PUBLIC_KEY, hash=HASHED.hexdigest())
 
-
+# NOTE: Agregamos los siguientes 3 decoradores
+# para que Swagger considere a la función como una 
+# vista de API y pueda ser visualizada en su UI.
+# @swagger_auto_schema(methods=['get'])
+# @api_view(['GET'])
+# @renderer_classes([TemplateHTMLRenderer])
 @csrf_exempt
 def get_comics(request):
     '''
+    ```
     Vista personalizada de API para comprar comics, 
     primero consultamos los comics disponibles en la página de Marvel, 
     luego generamos una lista de los que tienen precio y descripción, 
     porque varios vienen `null`.
+    ```
     '''
     # Declaramos nuestras variables:
     id = []
@@ -154,9 +166,6 @@ def get_comics(request):
     return HttpResponse(template)
 
 
-
-
-# @api_view(['GET']) NOTE: Usar este la primera parte de la clase de APIS!
 @csrf_exempt
 def purchased_item(request):
     '''Incluye la lógica de guardar lo pedido en la base de datos 

@@ -44,7 +44,7 @@ La lógica a seguir podría ser:
 * Consultar al modelo 'User' si existe dicho usuario y obtener el objeto del modelo.
     * ``` user = User.objects.filter(username=username) ```
 * Con dicho objeto, consultar en el modelo "WishList" por los comics que este usuario posee en favoritos. La consulta puede ser similar a:
-    * ``` wish_list = WishList.objects.filter(user_id=user.first(), favorite=True) ```
+    * ``` wish_list = WishList.objects.filter(user=user.first(), favorite=True) ```
 * Ahora dispondrá de una lista de objetos del modelo "WishList" de dicho usuario que están en favoritos, con estos datos, debemos consultar qué comics están en esta lista:
     * ``` comic_obj = Comic.objects.filter(id=f'{wish.comic_id}').first() ```
 (Nótese que el argumento del filtro está casteado a string y lo llamamos "wish" ya que es solo un elemento de la lista "wish_list") 
