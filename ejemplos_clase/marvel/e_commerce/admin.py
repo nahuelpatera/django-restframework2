@@ -36,5 +36,5 @@ class ComicsAdmin(admin.ModelAdmin):
 @admin.register(WishList)
 class wish_listAdmin(admin.ModelAdmin):
     list_display = ('user', 'comic', 'favorite', 'cart')
-    list_display_links = ('user_id', 'comic_id')
+    list_display_links = ('user', 'comic')
     list_filter= ('favorite','cart')
