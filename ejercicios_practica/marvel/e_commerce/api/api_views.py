@@ -1,48 +1,37 @@
-# Primero, importamos los serializadores
-from e_commerce.api.serializers import *
-
-# Segundo, importamos los modelos:
 from django.contrib.auth.models import User
-from e_commerce.models import Comic,WishList
-
-# Luego importamos las herramientas para crear las api views con Django REST FRAMEWORK:
+from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 
-# (GET) Listar todos los elementos en la entidad:
-from rest_framework.generics import ListAPIView
-
-# (GET - Detalle) Lista un solo elemento de la entidad.
-from rest_framework.generics import RetrieveAPIView
-
-# (POST) Inserta elementos en la DB
-from rest_framework.generics import CreateAPIView
-
-# (GET-POST) Para ver e insertar elementos en la DB
-from rest_framework.generics import ListCreateAPIView
-
-from rest_framework.generics import RetrieveUpdateAPIView
-
-from rest_framework.generics import DestroyAPIView
-
-# Esto en realidad lo podemos hacer como:
-# from rest_framework.generics import (
-#     ListAPIView,
-#     CreateAPIView,
-#     ListCreateAPIView,
-#     RetrieveUpdateAPIView,
-#     DestroyAPIView)
-# de manera más prolija
-
+# (GET - ListAPIView) Listar todos los elementos en la entidad:
+# (POST - CreateAPIView) Inserta elementos en la DB
+# (GET - RetrieveAPIView) Devuelve un solo elemento de la entidad.
+# (GET-POST - ListCreateAPIView) Para listar o insertar elementos en la DB
+# (GET-PUT - RetrieveUpdateAPIView) Devuelve o actualiza un elemento en particular.
+# (DELETE - DestroyAPIView) Permite eliminar un elemento.
+from rest_framework.generics import (
+    ListAPIView,
+    CreateAPIView,
+    RetrieveAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateAPIView,
+    DestroyAPIView,
+    GenericAPIView
+)
+from rest_framework.views import APIView
 # Importamos librerías para gestionar los permisos de acceso a nuestras APIs
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.authentication import BasicAuthentication, TokenAuthentication
-from django.contrib.auth import authenticate
+from rest_framework.authentication import (
+    BasicAuthentication, TokenAuthentication
+)
 from rest_framework.authtoken.models import Token
+from rest_framework.parsers import JSONParser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
+
+from e_commerce.api.serializers import *
+from e_commerce.models import Comic, WishList
 
 
 mensaje_headder = '''
@@ -72,7 +61,7 @@ class GetComicAPIView(ListAPIView):
     serializer_class = ComicSerializer
 
     # Equivale a --> permission_classes = (IsAdminUser & IsAuthenticated,)
-    permission_classes = (IsAdminUser | IsAuthenticated,)
+    permission_classes = (IsAuthenticated | IsAdminUser,)
     # Descomentar y mostrar en clases para ver las diferencias entre 
     # estos tipos de Authentication. Mostrar en Postman.
 
@@ -97,10 +86,10 @@ class ListCreateComicAPIView(ListCreateAPIView):
     __doc__ = f'''{mensaje_headder}
     `[METODO GET-POST]`
     Esta vista de API nos devuelve una lista de todos los comics presentes 
-    en la base de datos.
+    en la base de datos, pero en este caso ordenados según "marvel_id".
     Tambien nos permite hacer un insert en la base de datos.
     '''
-    queryset = Comic.objects.all()
+    queryset = Comic.objects.all().order_by('marvel_id')
     serializer_class = ComicSerializer
     permission_classes = (IsAuthenticated & IsAdminUser,)
 
@@ -108,7 +97,8 @@ class ListCreateComicAPIView(ListCreateAPIView):
 class RetrieveUpdateComicAPIView(RetrieveUpdateAPIView):
     __doc__ = f'''{mensaje_headder}
     `[METODO GET-PUT-PATCH]`
-    Esta vista de API nos permite actualizar un registro, o simplemente visualizarlo.
+    Esta vista de API nos permite actualizar un registro,
+    o simplemente visualizarlo.
     '''
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
@@ -123,57 +113,88 @@ class DestroyComicAPIView(DestroyAPIView):
     '''
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
-    permission_classes = (IsAuthenticated | IsAdminUser,)
+    permission_classes = (IsAuthenticated & IsAdminUser,)
 
 
-# NOTE: APIs MIXTAS:
+# class GetOneComicAPIView(RetrieveAPIView):
+#     __doc__ = f'''{mensaje_headder}
+#     `[METODO GET]`
+#     Esta vista de API nos devuelve un comic en particular de la base de datos.
+#     '''
+#     serializer_class = ComicSerializer
+#     permission_classes = (IsAuthenticated | IsAdminUser,)
+#     queryset = Comic.objects.all()
 
-class GetOneComicAPIView(ListAPIView):
+
+class GetOneComicAPIView(RetrieveAPIView):
     __doc__ = f'''{mensaje_headder}
     `[METODO GET]`
     Esta vista de API nos devuelve un comic en particular de la base de datos.
     '''
     serializer_class = ComicSerializer
     permission_classes = (IsAuthenticated | IsAdminUser,)
+    queryset = Comic.objects.all()
 
     def get_queryset(self):
         '''
-        Sobrescribimos la función `get_queryset` para poder filtrar el request 
-        por medio de la url. En este caso traemos de la url por medio de `self.kwargs` 
-        el parámetro `comic_id` y con él realizamos una query para traer 
-        el comic del ID solicitado.  
+        Sobrescribimos el método `get_queryset()` para poder filtrar el 
+        request por medio de la url. En este caso traemos de la url 
+        por medio de `self.kwargs` el parámetro `id` y con él 
+        realizamos una query para traer el comic del ID solicitado. 
         '''
-        try:
-            comic_id = self.kwargs['pk']
-            queryset = Comic.objects.filter(id=comic_id)
-            return queryset
-        except Exception as error:
-            return {'error': f'Ha ocurrido la siguiente excepción: {error}'}
+        comic_id = self.kwargs['pk']
+        queryset = self.queryset.filter(id=comic_id)
+        return queryset
+
+
+class GetOneMarvelComicAPIView(RetrieveAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO GET]`
+    Esta vista de API nos devuelve un comic en particular de la base de datos
+    a partir del valor del campo "marvel_id" pasado por URL.
+    '''
+    serializer_class = ComicSerializer
+    permission_classes = (IsAuthenticated | IsAdminUser,)
+    queryset = Comic.objects.all()
+    lookup_field = 'marvel_id'
 
 # Otra forma de realizar un Get y traernos un solo
-# objeto o instancia(Detalle).
-# class GetOneComicAPIView(RetrieveAPIView):
+# # objeto o instancia(Detalle) utilizando el método ".get_object()"
+# y sobreescribiendo el método ".get()".
+# class GetOneMarvelComicAPIView(RetrieveAPIView):
 #     serializer_class = ComicSerializer
-#     permission_classes = (IsAuthenticated & IsAdminUser,)
-#     queryset = serializer_class.Meta.model.objects.filter()
-    
-#     # def get_queryset(self):
-#     #     # A partir del serializador, accedo al modelo y realizo
-#     #     # el filtrado.
-#     #     return self.get_serializer().Meta.model.objects.filter()
+#     permission_classes = (IsAuthenticated | IsAdminUser,)
+#     queryset = Comic.objects.all()
+#     lookup_field = 'marvel_id'
 
-# class GetOneComicAPIView(ListAPIView):
-#     serializer_class = ComicSerializer
-#     permission_classes = (IsAuthenticated & IsAdminUser,)
-
-#     def get_queryset(self, pk=None):
-#         # NOTE: Probar que sucede si ingreso un pk(id) que no existe.
-#         return self.serializer_class.Meta.model.objects.get(pk=pk)
-#         # return get_object_or_404(self.serializer_class.Meta.model, pk=pk)
-    
-#     def get(self, request, pk=None):
+#     def get(self, request, *args, **kwargs):
 #         serializer = self.get_serializer(
-#             instance=self.get_queryset(pk=pk), many=False
+#             instance=self.get_object(), many=False
+#         )
+#         return Response(
+#             data=serializer.data, status=status.HTTP_200_OK
+#         )
+
+
+# Si tuvieramos que hacerlo más genérico, usamos APIView, lo cual
+# nos permite tener más personalización sobre la View.
+# class GetOneMarvelComicAPIView(APIView):
+#     permission_classes = (IsAuthenticated | IsAdminUser,)
+
+#     def get_queryset(self):
+#         return Comic.objects.filter(
+#             marvel_id=self.kwargs.get('marvel_id')
+#         )
+
+#     def get(self, request, *args, **kwargs):
+#         _queryset = self.get_queryset()
+#         if not _queryset.exists():
+#             return Response(
+#                 data={'detail': 'Not found.'},
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+#         serializer = ComicSerializer(
+#             instance=_queryset.first(), many=False
 #         )
 #         return Response(
 #             data=serializer.data, status=status.HTTP_200_OK
@@ -207,104 +228,30 @@ class LoginUserAPIView(APIView):
     authentication_classes = ()
     permission_classes = ()
 
-
     def post(self, request):
-        user_data = {}
-        try:
-            # Obtenemos los datos del request:
-            username = request.data.get('username')
-            password = request.data.get('password')
-            # Obtenemos el objeto del modelo user, a partir del usuario y contraseña,
-            # NOTE: es importante el uso de este método, porque aplica el hash del password!
-            account = authenticate(username=username, password=password)
+        # Realizamos validaciones a través del serializador
+        user_login_serializer = UserLoginSerializer(data=request.data)
+        if user_login_serializer.is_valid():
+            _username = request.data.get('username')
+            _password = request.data.get('password')
 
-            if account:
-                # Si el usuario existe y sus credenciales son validas,
-                # tratamos de obtener el TOKEN:
-                try:
-                    token = Token.objects.get(user=account)
-                except Token.DoesNotExist:
-                    # Si el TOKEN del usuario no existe, lo creamos automáticamente:
-                    token = Token.objects.create(user=account)
-
-                # El try except se puede reemplazar por lo siguiente:
-                # token, created = Token.objects.get_or_create(user=account)
-                
-                # Con todos estos datos, construimos un JSON de respuesta:
-                user_data['user_id'] = account.pk
-                user_data['username'] = username
-                user_data['first_name'] = account.first_name
-                user_data['last_name'] = account.last_name
-                user_data['email']=account.email
-                user_data['is_active'] = account.is_active
-                user_data['token'] = token.key                
-                # Devolvemos la respuesta personalizada
+            # Si el usuario existe y sus credenciales son validas,
+            # tratamos de obtener el TOKEN:
+            _account = authenticate(username=_username, password=_password)
+            if _account:
+                _token, _created = Token.objects.get_or_create(user=_account)
                 return Response(
-                    data=user_data, status=status.HTTP_201_CREATED
+                    data=TokenSerializer(instance=_token, many=False).data,
+                    status=status.HTTP_200_OK
                 )
-            else:
-                # Si las credenciales son invalidas, devolvemos algun mensaje de error:
-                user_data['response'] = 'Error'
-                user_data['error_message'] = 'Credenciales invalidas'
-                return Response(
-                    data=user_data, status=status.HTTP_401_UNAUTHORIZED
-                )
-
-        except Exception as error:
-            # Si aparece alguna excepción, devolvemos un mensaje de error
-            user_data['response'] = 'Error'
-            user_data['error_message'] = error
             return Response(
-                data=user_data, status=status.HTTP_400_BAD_REQUEST
+                data={'error': 'Invalid Credentials.'},
+                status=status.HTTP_400_BAD_REQUEST
             )
-
-# class LoginUserAPIView(APIView):
-#     '''
-#     ```
-#     Vista de API personalizada para recibir peticiones de tipo POST.
-#     Esquema de entrada:
-#     {"username":"root", "password":12345}
-    
-#     Utilizaremos JSONParser para tener  'Content-Type': 'application/json'\n\n
-#     Esta función sobrescribe la función post original de esta clase,
-#     recibe "request" y hay que setear format=None, para poder recibir 
-#     los datos en "request.data", la idea es obtener los datos enviados en el 
-#     request y autenticar al usuario con la función "authenticate()", 
-#     la cual devuelve el estado de autenticación.
-#     Luego con estos datos se consulta el Token generado para el usuario,
-#     si no lo tiene asignado, se crea automáticamente.
-#     Esquema de entrada:\n
-#     {
-#         "username": "root",
-#         "password": 12345
-#     }
-#     ```
-#     '''
-#     parser_classes = (JSONParser,)
-#     # renderer_classes = [JSONRenderer]
-#     authentication_classes = ()
-#     permission_classes = ()
-
-#     def post(self, request):
-#         usertokenserializer = UserTokenSerializer(data=request.data)
-#         if usertokenserializer.is_valid():
-#             _username = request.data.get('username')
-#             _password = request.data.get('password')
-
-#             # No hace falta validar si existe el account porque en el
-#             # serializador ya lo hicimos, por ende, si estamos parados acá es
-#             #  porque el username y password son correctas.
-#             _account = authenticate(username=_username, password=_password)
-#             _token, _created = Token.objects.get_or_create(user=_account)
-#             return Response(
-#                 data=TokenSerializer(instance=_token, many=False).data,
-#                 status=status.HTTP_200_OK
-#             )
-
-#         return Response(
-#             data=usertokenserializer.errors,
-#             status=status.HTTP_400_BAD_REQUEST
-#         )
+        return Response(
+            data=user_login_serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 # TODO: Agregar las vistas genericas(vistas de API basadas en clases) 
