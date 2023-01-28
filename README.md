@@ -45,7 +45,17 @@ Tenemos que ir a la carpeta donde se encuentra el archivo *manage.py*
 
 **$** `python manage.py makemigrations`
 
-**$** `python manage.py migrate` 
+**$** `python manage.py migrate`
+
+#### NOTA: Si se quiere sólo realizar las migracions correspondiente a una determinada aplicación del proyecto, podemos ejecutar los siguientes comandos:  
+
+**$** `python manage.py makemigrations nombre_aplicación`
+
+  - Ejemplo: **$** `python manage.py makemigrations e_commerce`
+
+**$** `python manage.py migrate nombre_aplicación` 
+
+  - Ejemplo: **$** `python manage.py migrate e_commerce`
 
 ### 5. Creamos un super usuario:  
 
