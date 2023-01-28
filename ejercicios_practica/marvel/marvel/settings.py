@@ -32,19 +32,44 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+# Apps que se agregan automáticamente al crear un proyecto en Django.
+BASE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Local apps: Acá ponemos el nombre de las carpetas de nuestras aplicaciones
-    'e_commerce',
-    # Third party apps: acá vamos agregando las aplicaciones de terceros, extensiones de Django.
+]
+
+# Acá van las apps de 3ros que necesitamos agregar para que Django las encuentre.
+THIRD_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
 ]
+
+# Acá van las apps que creamos nosotros.
+LOCAL_APPS = [
+    'e_commerce',
+]
+
+INSTALLED_APPS = BASE_APPS + THIRD_APPS + LOCAL_APPS
+
+# INSTALLED_APPS = [
+#     'django.contrib.admin',
+#     'django.contrib.auth',
+#     'django.contrib.contenttypes',
+#     'django.contrib.sessions',
+#     'django.contrib.messages',
+#     'django.contrib.staticfiles',
+#     # Local apps: Acá ponemos el nombre de las carpetas de nuestras aplicaciones
+#     'e_commerce',
+#     # Third party apps: acá vamos agregando las aplicaciones de terceros, extensiones de Django.
+#     'rest_framework',
+#     'rest_framework.authtoken',
+#     'drf_yasg',
+# ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -75,7 +100,9 @@ ROOT_URLCONF = 'marvel.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        # NOTE: Agregamos el directorio para los templates, necesario para Swagger
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        # 'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,9 +121,22 @@ WSGI_APPLICATION = 'marvel.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+# NOTE: Reemplazamos la configuración inicial de base de datos para trabajar con Postgres:
+# Recordemos:
+    #   POSTGRES_DB: marvel_db
+    #   POSTGRES_USER: inove_user
+    #   POSTGRES_PASSWORD: 123Marvel!
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2' --> En desuso.
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'marvel_db',        # POSTGRES_DB
         'USER' : 'inove_user',      # POSTGRES_USER
         'PASSWORD' : '123Marvel!',  # POSTGRES_PASSWORD
@@ -157,3 +197,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AMARILLO = "\033[;33m"
 CIAN = "\033[;36m"
 VERDE = "\033[;32m"
+
+# NOTE: Para manejo de sesión.
+LOGIN_URL = '/admin/login'
