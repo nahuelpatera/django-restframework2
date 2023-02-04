@@ -53,7 +53,9 @@ La lógica a seguir podría ser:
 
         * El paso siguiente es armar la lista de diccionarios de retorno en la view, como por ejemplo:
             ``` 
+            
             [{
+                    'id': 1
                     'marvel_id': '',
                     'title': '',
                     'description': '',
@@ -62,6 +64,7 @@ La lógica a seguir podría ser:
                     'picture': '',
                 },
                 {
+                    'id': 2
                     'marvel_id': '',
                     'title': '',
                     'description': '',
@@ -90,6 +93,8 @@ La lógica a seguir podría ser:
   - Una solución, ¿podría ser agregar **paginado** a la API?. ¿Favorece la experiencia de usuario? Habrán notado que hoy en día mucha de las aplicaciones trabajan con esto.
   - Y si quisiéramos buscar dentro de todos esos resultados algún comic en particular, ¿sería un agregado favorable?. Piensen que hoy en día estando dentro de una aplicación las búsquedas de algo particular dentro de muchos resultados nos ahorra tiempo.
   - **¿Cómo podríamos implementar todo lo anterior?. ¿Dónde agregaríamos esa lógica?**.
+
+**IMPORTANTE**: Al descargar la colección y el Ambiente de Trabajo (Environment) que se encuentran en el Campus e importarla dentro de Postam van a poder probar sus APIs.
 
 ### 5. Instale Swagger para poder ver la documentación general de las APIs. 
 Basandose en la documentación de clase y el ejemplo brindado en "ejemplo_clase" instale Swagger para poder ver la documentación de sus APIs.
