@@ -74,7 +74,8 @@ La lógica a seguir podría ser:
     2) Hacer uso del serializador `ComicSerializer` para manejar la data que vamos a retornar sin necesidad de armar nosotros mismos la lista (camino recomendado).
         * Para eso necesitamos profundizar un poco más en el ORM de Django. La idea es realizar un queryset sobre el modelo *Comic* pero sin hacer uso de un bloque iterativo. A continuación se deja los links de las herramientas que provee para poder aplicarlas en este caso:
           *  [in](https://docs.djangoproject.com/en/3.2/ref/models/querysets/#in)
-          *  [values_list](https://docs.djangoproject.com/en/3.2/ref/models/querysets/#values-list) ó [values](https://docs.djangoproject.com/en/3.2/ref/models/querysets/#values)
+          *  [Subquery](https://docs.djangoproject.com/en/2.1/ref/models/expressions/#limiting-a-subquery-to-a-single-column)
+          *  [values](https://docs.djangoproject.com/en/3.2/ref/models/querysets/#values)
         * Queda en usted investigar y ver como asociarlos para poder obtener lo esperado. Ante cualquier duda se puede realizar las consultas necesarias.
 
 * La API también debe solicitar **autenticación** para su uso.
