@@ -82,6 +82,13 @@ La lógica a seguir podría ser:
 
 * **NOTA**: No es la única manera de encarar esta lógica para dicha View, existen varias maneras mucho más eficientes y óptimas, pero consideramos que es un 1er paso para acercarse e ir entendiendo como funciona el ORM de Django. Si usted considera otra manera de encarar el ejercicio, puede utilizarlo siempre y cuando cumpla con lo especificado. En la clase siguiente veremos un poco más esto y como poder mejorar dicha lógica.
 
+* **Preguntas y conclusiones que deberíamos plantearnos luego de realizar el punto anterior:**
+  - ¿Qué sucede si un usuario tiene cientos de comics en favoritos?.
+  - ¿El scroll que debemos hacer para ir viendo cada uno de ellos se vuelve bastante incómodo?.
+  - ¿Es una mala **experiencia para el usuario**?.
+  - ¿Cómo podríamos solucionar lo anterior?.
+  - Una solución, ¿podría ser agregar **paginado** a la API?. ¿Favorece la experencia de usuario? Habrán notado que hoy en día mucha de las páginas trabajan con esto.
+
 ### 5. Instale Swagger para poder ver la documentación general de las APIs. 
 Basandose en la documentación de clase y el ejemplo brindado en "ejemplo_clase" instale Swagger para poder ver la documentación de sus APIs.
 
