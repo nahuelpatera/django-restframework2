@@ -45,32 +45,39 @@ La lógica a seguir podría ser:
     * ``` user = User.objects.filter(username=username) ```
 * Con dicho objeto, consultar en el modelo "WishList" por los comics que este usuario posee en favoritos. La consulta puede ser similar a:
     * ``` wish_list = WishList.objects.filter(user=user.first(), favorite=True) ```
-* Ahora dispondrá de una lista de objetos del modelo "WishList" de dicho usuario que están en favoritos, con estos datos, podríamos iterar e ir obteniendo el id para consultar qué comics están en esta lista e ir almacenandolos en otra:
-    * ``` comic_obj = Comic.objects.filter(id=wish.comic_id).first() ```
-(Notese que llamamos "wish" al objeto que está iterando ya que es solo un elemento de la lista "wish_list") 
+* Ahora dispondrá de un queryset con los objetos del modelo "WishList" de dicho usuario que están en favoritos.
+* El paso siguiente es obtener un queryset con los comics, podemos optar por 2 de los posibles caminos:
+    1) Iterando cada objeto que hay dentro de **wish_list** e ir accediendo al *id* del comic. Por ejemplo:
+           * ```comic_obj = Comic.objects.get(id=wish.comic_id)```
+        (Notese que llamamos "wish" al objeto que está iterando ya que es solo un elemento de la lista "wish_list".) 
 
-* El paso siguiente es armar la lista de diccionarios de retorno, como por ejemplo:
+        * El paso siguiente es armar la lista de diccionarios de retorno en la view, como por ejemplo:
+            ``` 
+            [{
+                    'marvel_id': '',
+                    'title': '',
+                    'description': '',
+                    'price': 1.00,
+                    'stock_qty': '',
+                    'picture': '',
+                },
+                {
+                    'marvel_id': '',
+                    'title': '',
+                    'description': '',
+                    'price': 1.00,
+                    'stock_qty': '',
+                    'picture': '',
+                },
+                ...] 
+            ```
+    2) Hacer uso del serializador `ComicSerializer` para manejar la data que vamos a retornar sin necesidad de armar nosotros mismos la lista (camino recomendado).
+        * Para eso necesitamos profundizar un poco más en el ORM de Django. La idea es realizar un queryset sobre el modelo *Comic* pero sin hacer uso de un bloque iterativo. A continuación se deja los links de las herramientas que provee para poder aplicarlas en este caso:
+          *  [in](https://docs.djangoproject.com/en/3.2/ref/models/querysets/#in)
+          *  [values_list](https://docs.djangoproject.com/en/3.2/ref/models/querysets/#values-list) ó [values](https://docs.djangoproject.com/en/3.2/ref/models/querysets/#values)
+        * Queda en usted investigar y ver como asociarlos para poder obtener lo esperado. Ante cualquier duda se puede realizar las consultas necesarias.
 
-``` 
-[{
-        'marvel_id': '',
-        'title': '',
-        'description': '',
-        'price': 1.00,
-        'stock_qty': '',
-        'picture': '',
-    },
-    {
-        'marvel_id': '',
-        'title': '',
-        'description': '',
-        'price': 1.00,
-        'stock_qty': '',
-        'picture': '',
-    },
-    ...] 
-```
-* La API también debe solicitar autenticación para su uso.
+* La API también debe solicitar **autenticación** para su uso.
 
 * **NOTA**: No es la única manera de encarar esta lógica para dicha View, existen varias maneras mucho más eficientes y óptimas, pero consideramos que es un 1er paso para acercarse e ir entendiendo como funciona el ORM de Django. Si usted considera otra manera de encarar el ejercicio, puede utilizarlo siempre y cuando cumpla con lo especificado. En la clase siguiente veremos un poco más esto y como poder mejorar dicha lógica.
 
