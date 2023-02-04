@@ -84,12 +84,12 @@ La lógica a seguir podría ser:
 
 * **Preguntas y conclusiones que deberíamos plantearnos luego de realizar el punto anterior:**
   - ¿Qué sucede si un usuario tiene cientos de comics en favoritos?.
-  - ¿El scroll que debemos hacer para ir viendo cada uno de ellos se vuelve bastante incómodo?.
+  - El scroll que debemos hacer para ir viendo cada uno de ellos ¿se vuelve bastante incómodo?.
   - ¿Es una mala **experiencia para el usuario**?.
   - ¿Cómo podríamos solucionar lo anterior?.
-  - Una solución, ¿podría ser agregar **paginado** a la API?. ¿Favorece la experiencia de usuario? Habrán notado que hoy en día mucha de las páginas trabajan con esto.
-  - Y si quisiéramos buscar dentro de todos esos resultados algún comic en particular, ¿sería un agregado favorable? Piensen que hoy en día estando dentro de una aplicación las búsquedas de algo particular dentro de muchos resultados nos ahorra tiempo.
-  - ¿Cómo podríamos implementarlo?. ¿Dónde agregaríamos esa lógica?.
+  - Una solución, ¿podría ser agregar **paginado** a la API?. ¿Favorece la experiencia de usuario? Habrán notado que hoy en día mucha de las aplicaciones trabajan con esto.
+  - Y si quisiéramos buscar dentro de todos esos resultados algún comic en particular, ¿sería un agregado favorable?. Piensen que hoy en día estando dentro de una aplicación las búsquedas de algo particular dentro de muchos resultados nos ahorra tiempo.
+  - **¿Cómo podríamos implementar todo lo anterior?. ¿Dónde agregaríamos esa lógica?**.
 
 ### 5. Instale Swagger para poder ver la documentación general de las APIs. 
 Basandose en la documentación de clase y el ejemplo brindado en "ejemplo_clase" instale Swagger para poder ver la documentación de sus APIs.
