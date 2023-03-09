@@ -15,7 +15,8 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
     DestroyAPIView,
-    GenericAPIView
+    GenericAPIView,
+    UpdateAPIView
 )
 from rest_framework.views import APIView
 # Importamos librerías para gestionar los permisos de acceso a nuestras APIs
@@ -110,6 +111,35 @@ class RetrieveUpdateComicAPIView(RetrieveUpdateAPIView):
     queryset = Comic.objects.all()
     serializer_class = ComicSerializer
     permission_classes = (IsAuthenticated & IsAdminUser,)
+
+
+# En este caso observamos como es el proceso de actualización "parcial"
+# utilizando el serializador para validar los datos que llegan del request.
+# Dicho proceso se conoce como "deserialización".
+class UpdateComicAPIView(UpdateAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO PUT-PATCH]`
+    Esta vista de API nos permite actualizar un registro,
+    o simplemente visualizarlo.
+    '''
+    queryset = Comic.objects.all()
+    serializer_class = ComicSerializer
+    permission_classes = (IsAuthenticated & IsAdminUser,)
+    lookup_field = 'marvel_id'
+
+    def put(self, request, *args, **kwargs):
+        _serializer = self.get_serializer(
+            instance=self.get_object(),
+            data=request.data,
+            many=False,
+            partial=True
+        )
+        if _serializer.is_valid():
+            _serializer.save()
+            return Response(data=_serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            data=_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class DestroyComicAPIView(DestroyAPIView):
