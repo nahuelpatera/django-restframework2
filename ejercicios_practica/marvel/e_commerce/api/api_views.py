@@ -16,7 +16,7 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
     DestroyAPIView,
     GenericAPIView,
-    UpdatedAPIView,
+    UpdateAPIView,
 )
 from rest_framework.views import APIView
 # Importamos librerías para gestionar los permisos de acceso a nuestras APIs
@@ -288,3 +288,95 @@ class LoginUserAPIView(APIView):
 # que permitan realizar un CRUD del modelo de wish-list.
 # TODO: Crear una vista generica modificada(vistas de API basadas en clases)
 # para traer todos los comics que tiene un usuario.
+
+
+class GetWishListAPIView(ListAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO GET]`
+    Esta vista de API nos devuelve una lista de todos los WishList presentes 
+    en la base de datos.
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+
+    # Equivale a --> permission_classes = (IsAdminUser & IsAuthenticated,)
+    permission_classes = (IsAuthenticated | IsAdminUser,)
+    # Descomentar y mostrar en clases para ver las diferencias entre 
+    # estos tipos de Authentication. Mostrar en Postman.
+
+    # HTTP Basic Authentication
+    # authentication_classes = [BasicAuthentication]
+
+    # Token Authentication
+    # authentication_classes = [TokenAuthentication]
+
+
+class PostWishListAPIView(CreateAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO POST]`
+    Esta vista de API nos permite hacer un insert en la base de datos.
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+    permission_classes = (IsAuthenticated & IsAdminUser,)
+
+
+
+# En este caso observamos como es el proceso de actualización "parcial"
+# utilizando el serializador para validar los datos que llegan del request.
+# Dicho proceso se conoce como "deserialización".
+class UpdateWishListAPIView(UpdateAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO PUT-PATCH]`
+    Esta vista de API nos permite actualizar un registro,
+    o simplemente visualizarlo.
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+    permission_classes = (IsAuthenticated & IsAdminUser,)
+    lookup_field = 'comic_id'
+
+    def put(self, request, *args, **kwargs):
+        _serializer = self.get_serializer(
+            instance=self.get_object(),
+            data=request.data,
+            many=False,
+            partial=True
+        )
+        sin_error = self.request.user == _serializer.get_user and self.request.comic == _serializer.get_comic 
+        if _serializer.is_valid():
+            if _serializer.is_valid():
+                 if self.request.user != _serializer.validated_data['user'] or self.request.comic != _serializer.validated_data['comic']:
+                    return Response(
+                    data={'error': 'No puede modificarse el usuario o el comic'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            _serializer.save()
+            return Response(data=_serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            data=_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    def get_queryset(self):
+        queryset = self.queryset.filter(user=self.request.user)
+        return queryset
+    
+
+    
+
+
+class DeleteWishListAPIView(DestroyAPIView):
+    __doc__ = f'''{mensaje_headder}
+    `[METODO DELETE]`
+    Esta vista de API nos devuelve una lista de todos los WishList presentes 
+    en la base de datos.
+    '''
+    queryset = WishList.objects.all()
+    serializer_class = WishListSerializer
+    permission_classes = (IsAuthenticated & IsAdminUser,)
+    lookup_field = 'comic_id'
+
+        
+    def get_queryset(self):
+        queryset = self.queryset.filter(user=self.request.user)
+        return queryset

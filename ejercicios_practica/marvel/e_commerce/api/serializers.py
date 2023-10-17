@@ -43,3 +43,22 @@ class TokenSerializer(serializers.ModelSerializer):
         
 
 # TODO: Realizar el serializador para el modelo de WishList
+
+class WishListSerializer(serializers.ModelSerializer):
+    # new_field = serializers.SerializerMethodField()
+    
+    def get_user(self, obj):
+        user = serializers.PrimaryKeyRelatedField(write_only=True,
+                                                  queryset=User.objects.all())
+        return user
+    
+    def get_comic(self, obj):
+        comic = serializers.PrimaryKeyRelatedField(write_only=True,
+                                                  queryset=Comic.objects.all())
+        return comic
+
+    class Meta:
+        model = WishList
+        fields = '__all__'
+        fields = ('id', 'user', 'comic', 'favorite', 'cart', 'wished_qty', 'bought_qty')
+        read_only_fields = ('id',)
